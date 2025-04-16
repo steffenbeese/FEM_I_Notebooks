@@ -754,8 +754,6 @@ slideshow:
   slide_type: ''
 ---
 import matplotlib.pyplot as plt
-import scienceplots
-plt.style.use(['science','grid'])
 wanalytisch = sp.lambdify(x,wfun.subs({"EI":Emod*sma,"q0":q0,"ell":ell}),"numpy")
 
 

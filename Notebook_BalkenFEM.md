@@ -840,6 +840,8 @@ def plotMoment(x,M):
     ax.plot(x,M,'r')
     ax.plot(x,Manalytisch(x),'r--')
     ax.legend(["M - FEM","M - analytisch"])
+    ax.grid(True)
+
 
 plotMoment(xm,M)
 ```
@@ -878,7 +880,8 @@ def plotQuerkraft(x,Q):
     ax.plot(x,Q,'b')
     ax.plot(x,Qanalytisch(x),'b--')
     ax.legend(["Q - FEM","Q - analytisch"])
-
+    ax.grid(True)
+    
 plotQuerkraft(xm,Q)
 ```
 
@@ -1021,10 +1024,12 @@ ax[0].plot(df.index,df["M"])
 ax[0].set_title("Konvergenz Schnittmoment")
 ax[0].set_xlabel("Anzahl Knoten")
 ax[0].set_ylabel("M")
+ax[0].grid(True)
 ax[1].plot(df.index,df["Q"])
 ax[1].set_title("Konvergenz SchnittKraft Q")
 ax[1].set_xlabel("Anzahl Knoten")
 ax[1].set_ylabel("Q")
+ax[1].grid(True)
 ```
 
 ```{code-cell} ipython3
@@ -1040,12 +1045,14 @@ ax[0].set_xlabel("Anzahl Knoten")
 ax[0].set_ylabel("error M")
 ax[0].set_yscale("log")  # Set y-axis to logarithmic scale
 ax[0].set_xscale("log")  # Set x-axis to logarithmic scale
+ax[0].grid(True)
 ax[1].plot(df.index,df["error Q"])
 ax[1].set_title("Konvergenz Fehler SchnittKraft Q")
 ax[1].set_xlabel("Anzahl Knoten")
 ax[1].set_ylabel("error Q")
 ax[1].set_yscale("log")  # Set y-axis to logarithmic scale
 ax[1].set_xscale("log")  # Set x-axis to logarithmic scale
+ax[0].grid(True)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": "slide"}}

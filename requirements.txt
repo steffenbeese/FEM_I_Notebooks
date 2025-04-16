@@ -4,3 +4,4 @@ scienceplots
 plotly
 pandas
 sympy
+rise

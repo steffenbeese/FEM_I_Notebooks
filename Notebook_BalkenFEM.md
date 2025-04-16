@@ -1,6 +1,6 @@
 ---
 jupytext:
-  formats: md:myst
+  formats: md:myst,ipynb
   text_representation:
     extension: .md
     format_name: myst
@@ -74,7 +74,7 @@ $$
 \end{align}
 $$
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -137,7 +137,7 @@ Die Steifigkeitsmatrix $\boldsymbol{K}_{IJ}$ wollen wir jetzt interaktiv berechn
 
 ### Definition der Formfunktionen
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -171,7 +171,7 @@ $$
 \end{align*}
 $$
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -181,7 +181,7 @@ dNdxidxi = sp.diff(N,xi,2)
 dNdxidxi
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -204,7 +204,7 @@ $$
 \end{align*}
 $$
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -227,7 +227,7 @@ $$
 \end{align*}
 $$
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -268,7 +268,7 @@ Den Vektor der Streckenlasten $\boldsymbol{F}_Q$ berechnen wir nun interaktiv.
 
 ### Ansatz für die Streckenlast
 
-```{code-cell}
+```{code-cell} ipython3
 q1,q2 = sp.symbols('q1 q2')
 qh = sp.Matrix([q1,q2])
 Nq1 = 1-xi
@@ -293,7 +293,7 @@ $$
 \end{align*} 
 $$
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -319,7 +319,7 @@ $$
 \end{align*} 
 $$
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -352,7 +352,7 @@ EI w'''' &= -Q(x) = q_{0} \left(\frac{\ell}{2} - x\right)
 \end{align*}
 $$
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -396,7 +396,7 @@ PlotGrid(1,3,p1,p2,p3,size=(15,5));
 
 ## Lösung mit der FEM
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -667,7 +667,7 @@ class BalkenFEM:
 
 ## Set Up Problem
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -711,7 +711,7 @@ Lastfall.setElementData(Elist, Ilist)
 
 ## Definiere Randbedingungen
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -747,7 +747,7 @@ Lastfall.setDistributedLoads(q)
 
 ## Plot Problem
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -785,7 +785,7 @@ plotBalken(X,q,fval1)
 
 ## Solve Problem
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -795,7 +795,7 @@ Lastfall.assembleGlobalMatrix2D()
 Lastfall.solveSystem()
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -804,7 +804,7 @@ slideshow:
 plotBalken(X,q,fval1,Lastfall.dof[:,0])
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -827,7 +827,7 @@ print(f"Fehler: {error}%")
 
 ### Schnittmoment
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -846,7 +846,7 @@ def plotMoment(x,M):
 plotMoment(xm,M)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -865,7 +865,7 @@ print(f"Fehler: {error}%")
 
 ### Schnittgröße: Querkraft
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -884,7 +884,7 @@ def plotQuerkraft(x,Q):
 plotQuerkraft(xm,Q)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -903,7 +903,7 @@ print(f"Fehler: {error}%")
 
 ## Konvergenzstudie
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -977,7 +977,7 @@ def setUpProblem(numnp):
     return np.min(Q),np.min(M),Lastfall
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -999,7 +999,7 @@ for i,p in enumerate(npoints):
     ErrorM[i] = (Ma-MFEM[i])/Ma*100
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -1012,7 +1012,7 @@ df = pd.DataFrame({"M":MFEM,"error M":ErrorM,"Q":QFEM,"error Q":ErrorQ},index=np
 df
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -1029,7 +1029,7 @@ ax[1].set_xlabel("Anzahl Knoten")
 ax[1].set_ylabel("Q")
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:
@@ -1054,7 +1054,7 @@ ax[1].set_xscale("log")  # Set x-axis to logarithmic scale
 
 ## Analyse der Steifigkeitsmatrix
 
-```{code-cell}
+```{code-cell} ipython3
 ---
 editable: true
 slideshow:

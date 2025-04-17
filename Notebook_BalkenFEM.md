@@ -22,6 +22,10 @@ In diesem Notebook wird die Lösung eines Balkenproblems mit der Methode der fin
     <img src="images/Balken_TM2.png" alt="Balken_TM21.png" style="width: 100%;">
 </div>
 
+_Kinematik der Balkendeformation nach: Gross, D., Hauger, W., Schröder, J., & Wall, W. A. (2007). Technische Mechanik:
+Band 2: Elastostatik. Springer._
+
+
 Die Differentialgleichung für die Durchbiegung $w$ eines Balkens mit konstanter Biegesteifigkeit $EI$ lautet:
 
 $$
@@ -77,6 +81,8 @@ $$
 ```{code-cell} ipython3
 ---
 editable: true
+jupyter:
+  source_hidden: true
 slideshow:
   slide_type: subslide
 tags: ['remove_input ']

@@ -410,8 +410,41 @@ slideshow:
 ---
 import numpy as np
 class BalkenFEM:
+    """
+    Eine Klasse zur Finite-Elemente-Methode (FEM) für Balkenstrukturen.
 
+    Diese Klasse implementiert die Finite-Elemente-Methode für die Analyse von Balkenstrukturen.
+    Sie unterstützt die Definition von Knoten, Elementen, Materialeigenschaften, Randbedingungen
+    und externen Kräften. Die Klasse kann die globale Steifigkeitsmatrix aufbauen, das Gleichungssystem
+    lösen und die Resultate wie Verformungen, Momente und Querkräfte berechnen.
+
+    Attribute:
+        numnp (int): Anzahl der Knoten.
+        numel (int): Anzahl der Elemente.
+        dim (int): Dimension des Problems (standardmäßig 2 für 2D-Probleme).
+        nel (int): Anzahl der Knoten pro Element (standardmäßig 2 für Balkenelemente).
+        numdof (int): Gesamtanzahl der Freiheitsgrade.
+        elements (np.ndarray): Array zur Speicherung der Elementverbindungen.
+        eData (list): Liste zur Speicherung der Materialeigenschaften der Elemente.
+        coords (np.ndarray): Array zur Speicherung der Knotenkoordinaten.
+        dof (np.ndarray): Array zur Speicherung der Freiheitsgrade der Knoten.
+        eqind (np.ndarray): Array zur Speicherung der Gleichungsindizes der Freiheitsgrade.
+        Kges (np.ndarray): Globale Steifigkeitsmatrix.
+        Fges (np.ndarray): Globale Kraftvektor.
+        qL (np.ndarray): Verteilte Lasten an den Knoten.
+        u (np.ndarray): Verformungen der Knoten.
+        neumannBC (any): Neumann-Randbedingungen (externe Kräfte).
+        dirichletBC (any): Dirichlet-Randbedingungen (Verschiebungen).
+        Kuu, Kud, Kdu, Kdd (np.ndarray): Partitionierte Steifigkeitsmatrizen.
+    """
     def __init__(self,numnp=2,numel=1):
+        """
+        Initialisiert die BalkenFEM-Klasse.
+
+        Args:
+            numnp (int): Anzahl der Knoten.
+            numel (int): Anzahl der Elemente.
+        """        
         self.numnp = numnp
         self.numel = numel
         self.dim = 2
@@ -431,19 +464,46 @@ class BalkenFEM:
         self.Kuu = self.Kud = self.Kdu = self.Kdd = None
 
     def setNodalCoords(self,coords):
+        """
+        Setzt die Knotenkoordinaten.
+
+        Args:
+            coords (np.ndarray): Array der Knotenkoordinaten.
+        """        
         self.coords[:,:] = coords[:,:]
     
     def setElements(self,elements):
+        """
+        Setzt die ElementKonnektivität.
+
+        Args:
+            elements (np.ndarray): Array der ElementKonnektivität.
+        """        
         for i in range(self.numel):
             for j in range(self.nel):
                 self.elements[i,j] = int(elements[i,j])
                 
 
     def setElementData(self,youngsmoduli,sma):
+        """
+        Setzt die Materialeigenschaften der Elemente.
+
+        Args:
+            youngsmoduli (list): Liste der Elastizitätsmodule der Elemente.
+            sma (list): Liste der Querschnittsflächenmomente (Flächentägheitsmomente) der Elemente.
+        """        
         for i in range(self.numel):
             self.eData.append({"sma":sma[i],"youngsmodulus":youngsmoduli[i]})
 
     def setDirichletBoundaryCondition(self,dirichletNodes,dirichletDir,dirichletVal):
+        """
+        Setzt die Dirichlet-Randbedingungen (Verschiebungen und Neigungen).
+
+        Args:
+            dirichletNodes (list): Liste der Knoten mit Dirichlet-Randbedingungen.
+            dirichletDir (list): Liste der  Dirichlet-Randbedingungen: 0 für Verschiebung, 1 für Neigung.
+            dirichletVal (list): Liste der Werte der Dirichlet-Randbedingungen.
+        """        
         eqID = 1
         for nodeID in range(self.numnp):
             for dirID in range(self.dim):
@@ -463,19 +523,51 @@ class BalkenFEM:
             self.dof[nodeID,dirId] = dVal
     
     def setExternalForces(self,neumannNodes,neumannDir,neumannVal):
+        """
+        Setzt die Neumann-Randbedingungen (externe Kräfte).
+
+        Args:
+            neumannNodes (list): Liste der Knoten mit Neumann-Randbedingungen.
+            neumannDir (list): Liste  Neumann-Randbedingungen: 0 = Kraft, 1 = Moment.
+            neumannVal (list): Liste der Werte der Neumann-Randbedingungen.
+        """        
         for nodeID,nDir,nVal in zip(neumannNodes,neumannDir,neumannVal):
             self.Fges[nodeID,nDir] = nVal
 
     def setDistributedLoads(self,qloads):
+        """
+        Setzt die verteilten Lasten an den Knoten. So definiert sind keine Sprünge über Elementgrenzen hinweg möglich.
+
+        Args:
+            qloads (np.ndarray): Array der verteilten Lasten an den Knoten.
+        """
         self.qL[:] = qloads[:]
 
     def _getElementDirector(self,elID):
+        """
+        Berechnet den Richtungsvektor eines Elements.
+
+        Args:
+            elID (int): Element-ID.
+
+        Returns:
+            np.ndarray: Richtungsvektor des Elements.
+        """
         nodeID1 = self.elements[elID,0]
         nodeID2 = self.elements[elID,1]
         director = self.coords[nodeID2,:] - self.coords[nodeID1,:]
         return director
 
     def _getElementstiffness_(self,elID):
+        """
+        Berechnet die Steifigkeitsmatrix und die Kraftvektoren aus der verteilten Last eines Elements.
+
+        Args:
+            elID (int): Element-ID.
+
+        Returns:
+            tuple: Steifigkeitsmatrix (np.ndarray) und Kraftvektor F_Q (np.ndarray) des Elements.
+        """
         director = self._getElementDirector(elID) 
         le = np.linalg.norm(director)
         Ke = self.eData[elID]["youngsmodulus"]*self.eData[elID]["sma"]/(le**3) * np.ones((4,4))
@@ -513,12 +605,39 @@ class BalkenFEM:
         return Ke,Fq
 
     def secondDerivative(self,xi):
+        """
+        Berechnet die zweite Ableitung der Formfunktionen nach der normalisierten Koordinate xi.
+
+        Args:
+            xi (float): Normalisierte Koordinate.
+
+        Returns:
+            np.ndarray: Zweite Ableitung der Formfunktionen.
+        """
         return np.array([6*(2*xi-1),2*(3*xi-2),6*(1-2*xi),2*(3*xi-1) ])
 
     def thirdDerivative(self,xi):
+        """
+        Berechnet die dritte Ableitung der Formfunktionen.
+
+        Args:
+            xi (float): Normalisierte Koordinate.
+
+        Returns:
+            np.ndarray: Dritte Ableitung der Formfunktionen.
+        """
         return np.array([6*(2),2*(3),6*(-2),2*(3) ])
 
     def computeMoment(self,n=10):
+        """
+        Berechnet die Momente entlang der Balkenstruktur.
+
+        Args:
+            n (int): Anzahl der Stützpunkte je Element für die Berechnung.
+
+        Returns:
+            tuple: Koordinaten (np.ndarray) und Momente (np.ndarray) entlang der Balkenstruktur.
+        """
         X = np.zeros(n*self.numel)
         Mges = np.zeros(n*self.numel)
         
@@ -540,6 +659,15 @@ class BalkenFEM:
         return X,Mges
 
     def computeQuerkraft(self,n=10):
+        """
+        Berechnet die Querkräfte entlang der Balkenstruktur.
+
+        Args:
+            n (int): Anzahl der Stützpunkte je Element für die Berechnung.
+
+        Returns:
+            tuple: Koordinaten (np.ndarray) und Querkräfte (np.ndarray) entlang der Balkenstruktur.
+        """
         X = np.zeros(n*self.numel)
         Qges = np.zeros(n*self.numel)
         
@@ -561,6 +689,15 @@ class BalkenFEM:
         return X,Qges
 
     def getDeflection(self,x):
+        """
+        Berechnet die Durchbiegung an einer bestimmten Position x entlang der Balkenstruktur.
+
+        Args:
+            x (float): Position entlang der Balkenstruktur.
+
+        Returns:
+            float: Durchbiegung an der Position x.
+        """
         for elID in range(self.numel):
             node1 = self.elements[elID,0]
             node2 =self.elements[elID,1]
@@ -576,6 +713,9 @@ class BalkenFEM:
                 return N @ dofe.T
 
     def assembleGlobalMatrix2D(self):
+        """
+        Baut die globale Steifigkeitsmatrix und den globalen Kraftvektor auf.
+        """
         for elID in range(self.numel):
             Ke,Fq = self._getElementstiffness_(elID)
             for nodeI in range(self.nel):
@@ -590,6 +730,9 @@ class BalkenFEM:
                             self.Kges[rowID,colID] += Ke[(nodeI*self.dim)+dimI,(nodeJ*self.dim)+dimJ]
 
     def solveSystem(self):
+        """
+        Löse das Gleichungssystem.
+        """
         # Erzeuge Hiflsmatrizen um die Freiheitsgrade zu sortieren
         numcdof = self.dirichletBC.shape[0]
         numfdof = self.numdof - numcdof
@@ -665,7 +808,6 @@ class BalkenFEM:
         for nodeI in range(numcdof):
             self.Fges[eqc_inv[nodeI,0],eqc_inv[nodeI,1]] = rF[ieq,0]
             ieq += 1 
-
     
 ```
 

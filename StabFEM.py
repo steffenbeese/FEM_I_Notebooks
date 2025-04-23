@@ -29,6 +29,12 @@ class StabFEM:
         self.dirichletBC = None
         self.Kuu = self.Kud = self.Kdu = self.Kdd = None
         
+    def resetFEM(self):
+        self.dof = np.zeros((self.numnp, self.dim))
+        self.eqind = np.zeros((self.numnp, self.dim), dtype=int)
+        self.Kges = np.zeros((self.numdof, self.numdof))
+        self.Fges = np.zeros((self.numnp, self.dim))
+        
     def setNodalCoordinates(self, X):
         """
         Setzt die Koordinaten der Knotenpunkte.

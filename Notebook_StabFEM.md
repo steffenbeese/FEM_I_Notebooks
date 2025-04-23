@@ -325,7 +325,13 @@ ax.legend()
 
 ```
 
-# Beispiel 2 - Fehleranalyse
+### Aufgabe:
+
+Versuchen Sie das Problem mit 2 und mit 3 Elementen zu lösen. Ändern Sie hierfür den obigen Quellcode ab.
+
++++
+
+## Beispiel 2 - Fehleranalyse
 
 - Wieviele Elemente benötigt man, damit der Fehler der Normalkraft kleiner als 5 % ist?
 - Tragen Sie den Fehler in Abhängigkeit von der Anzahl der Elemente in einem Diagramm auf
@@ -398,24 +404,19 @@ Einbau kürzer als vor dem Einbau?
 # SetUp des Problems
 ###############################################
 
-a = 150
-Astahl = 30
-Acu = 60
-EStahl = 210*10**3
-ECu = 105*10**3
-h = 3
+a = ???
+Astahl = ???
+Acu = ???
+EStahl = ???
+ECu = ???
+h = ???
 
 bsp3 = StabFEM(numnp=4,numel=3)
 X = np.array([
-    [0,0],
-    [a,0.0],
-    [2*a,0],
-    [3*a,0],
+???
 ])
 elements = np.array([
-    [0,1],
-    [1,2],
-    [2,3]
+???
 ])
 areas = [Astahl,Acu,Astahl]
 youngsM = [EStahl,ECu,EStahl]
@@ -427,8 +428,10 @@ bsp3.setElementConnectivity(elements)
 bsp3.setElementData(areas,youngsM,loads)
 
 # Setzen der Randbedingungen
-bsp3.setDirichletBoundaryCondition([0,1,1,2,2,3],[1,0,1,0,1,1],[0,h,0,-h,0,0]) # Knoten, Richtung, Wert
-# bsp3.setExternalForces([1],[0],[5000]) # Knoten, Richtung, Wert
+bsp3.setDirichletBoundaryCondition(
+    [???], #Knoten
+    [???], #Richtung
+    [???]) #Wert
 
 # Kontrolle der Eingaben
 print(f"Knotenkoordinaten:\n{bsp3.coords}")
@@ -446,10 +449,9 @@ bsp3.plotMesh()
 ###############################################
 
 # Schleife über alle Elemente, bilden der Elementmatrizen und -vektoren und assemblieren des globalen Systems
-bsp3.assembleGlobalMatrix()
-bsp3.assembleRightHandSide()
-# Lösen des Gleichungssystems
-bsp3.solveSystem()
+
+???
+
 display("Displacement:",bsp3.dof)
 display("Force:",bsp3.Fges)
 print(f'Kraft die notwendig ist, das mittlere Wellenstück zusammenzudrücken: {bsp3.Fges[1,0]}')
@@ -466,17 +468,19 @@ bsp3.plotMesh(deformed=True,scale=10)
 bsp3.resetFEM()
 
 # Setzen der Randbedingungen
-bsp3.setDirichletBoundaryCondition([0,0,1,2,3,3],[0,1,1,1,0,1],[h/2,0,0,0,-h/2,0]) # Knoten, Richtung, Wert
+bsp3.setDirichletBoundaryCondition(
+    [???], # Knoten
+    [???], # Richtung
+    [???]) # Wert
 
 ###############################################
 # Lösen des Problems
 ###############################################
 
 # Schleife über alle Elemente, bilden der Elementmatrizen und -vektoren und assemblieren des globalen Systems
-bsp3.assembleGlobalMatrix()
-bsp3.assembleRightHandSide()
-# Lösen des Gleichungssystems
-bsp3.solveSystem()
+
+???
+
 display("Displacement:",bsp3.dof)
 display("Force:",bsp3.Fges)
 ```
@@ -492,20 +496,16 @@ ax.set_ylabel("N [kN]")
 ax.grid(True)
 
 ax.legend()
-sigstahl = N[0]/(bsp3.eData[0]['area'])
-sigcu    = N[0]/(bsp3.eData[1]['area'])
+sigstahl = ???
+sigcu    = ???
 print(f'Spannungen im Stahlstab: {sigstahl}')
 print(f'Spannungen im Kupferstab: {sigcu}')
 ```
 
 ### Dehnung im mittleren Stabteil
 
-$$
-\epsilon  =  \frac{u_2-u_1}{a}
-$$
-
 ```{code-cell} ipython3
-eps = (bsp3.dof[2,0]-bsp3.dof[1,0])/(a)
+eps = ???
 print(f'Dehnung im mittleren Stab: {eps}')
 ```
 
@@ -540,20 +540,10 @@ E = 210*10**3
 F = -1000*10**3
 
 X = np.array([
-    [0,0],
-    [1.5*a,0.0],
-    [2*1.5*a,0],
-    [0.5*1.5*a,a],
-    [0.5*1.5*a+1.5*a,a],
+    ???
 ])
 elements = np.array([
-    [0,1],
-    [1,2],
-    [0,3],
-    [3,1],
-    [1,4],
-    [4,2],
-    [3,4]
+   ???
 ])
 
 
@@ -572,8 +562,15 @@ bsp4.setElementConnectivity(elements)
 bsp4.setElementData(areas,youngsM,loads)
 
 # Setzen der Randbedingungen
-bsp4.setDirichletBoundaryCondition([0,0,2,2],[0,1,0,1],[0,0,0,0]) # Knoten, Richtung, Wert
-bsp4.setExternalForces([1],[1],[F])
+bsp4.setDirichletBoundaryCondition(
+    [???], # Knoten
+    [???], # Richtung
+    [???]) # Wert
+bsp4.setExternalForces(
+    [???], # Knoten
+    [???], # Richtung
+    [???]) # Wert
+)
 
 # Kontrolle der Eingaben
 print(f"Knotenkoordinaten:\n{bsp4.coords}")
@@ -595,7 +592,7 @@ bsp4.assembleGlobalMatrix()
 bsp4.assembleRightHandSide()
 # Lösen des Gleichungssystems
 bsp4.solveSystem()
-print(f'Verschiebung im Kraftangriffspunkt: {bsp4.dof[1,1]} mm')
+print(f'Verschiebung im Kraftangriffspunkt: { ??? } mm')
 ```
 
 ```{code-cell} ipython3

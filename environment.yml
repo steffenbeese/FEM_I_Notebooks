@@ -32,7 +32,7 @@ dependencies:
   - gmp=6.3.0=hac33072_2
   - gmpy2=2.1.5=py310he8512ff_3
   - graphite2=1.3.13=h59595ed_1003
-  - harfbuzz=11.1.0=h3beb420_0
+  - harfbuzz=9.0.0=hda332d3_1
   - icu=75.1=he02047a_0
   - importlib_resources=6.5.2=pyhd8ed1ab_0
   - jsonschema=4.23.0=pyhd8ed1ab_1
@@ -50,6 +50,7 @@ dependencies:
   - libbrotlidec=1.1.0=hb9d3cd8_2
   - libbrotlienc=1.1.0=hb9d3cd8_2
   - libcblas=3.9.0=31_he106b2a_openblas
+  - libclang-cpp19.1=19.1.7=default_hb5137d0_2
   - libclang-cpp20.1=20.1.3=default_h1df26ce_0
   - libclang13=20.1.3=default_he06ed0a_0
   - libcups=2.3.3=h4637d8d_4
@@ -73,6 +74,7 @@ dependencies:
   - libiconv=1.18=h4ce23a2_1
   - libjpeg-turbo=3.1.0=hb9d3cd8_0
   - liblapack=3.9.0=31_h7ac8fdf_openblas
+  - libllvm19=19.1.7=ha7bfdaf_1
   - libllvm20=20.1.3=he9d0ab4_0
   - liblzma=5.8.1=hb9d3cd8_0
   - libnsl=2.0.1=hd590300_0
@@ -103,8 +105,8 @@ dependencies:
   - mpfr=4.2.1=h90cbb55_3
   - mpmath=1.3.0=pyhd8ed1ab_1
   - munkres=1.1.4=pyh9f0ad1d_0
-  - mysql-common=9.2.0=h266115a_0
-  - mysql-libs=9.2.0=he0572af_0
+  - mysql-common=9.0.1=h266115a_6
+  - mysql-libs=9.0.1=he0572af_6
   - narwhals=1.36.0=pyh29332c3_0
   - nbformat=5.10.4=pyhd8ed1ab_1
   - ncurses=6.5=h2d0b736_3
@@ -124,7 +126,7 @@ dependencies:
   - plotly=6.0.1=pyhd8ed1ab_0
   - pthread-stubs=0.4=hb9d3cd8_1002
   - pyparsing=3.2.3=pyhd8ed1ab_1
-  - pyside6=6.9.0=py310hfd10a26_0
+  - pyside6=6.8.1=py310hfd10a26_0
   - python=3.10.17=hd6af730_0_cpython
   - python-dateutil=2.9.0.post0=pyhff2d567_1
   - python-fastjsonschema=2.21.1=pyhd8ed1ab_0
@@ -133,13 +135,14 @@ dependencies:
   - pytz=2025.2=pyhd8ed1ab_0
   - pyyaml=6.0.2=py310h89163eb_2
   - qhull=2020.2=h434a139_5
-  - qt6-main=6.9.0=h6441bc3_1
+  - qt6-main=6.8.1=h9d28a51_0
   - readline=8.2=h8c095d6_2
   - referencing=0.36.2=pyh29332c3_0
   - rpds-py=0.24.0=py310hc1293b2_0
   - setuptools=79.0.0=pyhff2d567_0
   - six=1.17.0=pyhd8ed1ab_0
   - sympy=1.13.3=pyh2585a3b_105
+  - texlive-core=20230313=he8f7729_15
   - tk=8.6.13=noxft_h4845f30_101
   - tomli=2.2.1=pyhd8ed1ab_1
   - tornado=6.4.2=py310ha75aee5_0

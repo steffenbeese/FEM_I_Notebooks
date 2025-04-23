@@ -278,15 +278,15 @@ class BalkenFEM:
                 Qges[elID*n+i] = -Q
         return X,Qges
 
-    def getDeflection(self,x):
+    def getDisplacement(self,x):
         """
-        Berechnet die Durchbiegung an einer bestimmten Position x entlang der Balkenstruktur.
+        Berechnet die Durchbiegung an einer bestimmten Position x entlang der Struktur.
 
         Args:
-            x (float): Position entlang der Balkenstruktur.
+            x (float): Position entlang der Struktur.
 
         Returns:
-            float: Durchbiegung an der Position x.
+            float: Verschiebung an der Position x.
         """
         for elID in range(self.numel):
             node1 = self.elements[elID,0]
@@ -294,7 +294,7 @@ class BalkenFEM:
             x1 = self.coords[node1,0]
             x2 = self.coords[node2,0]
 
-            if (x-x1 > -1.e-12) and (x-x2 < 0.0 ):
+            if (x >= x1-1.e-12) and (x < x2):
                 director = self._getElementDirector(elID) 
                 le = np.linalg.norm(director)
                 dofe = np.array([self.dof[node1,0],self.dof[node1,1],self.dof[node2,0],self.dof[node2,1]])

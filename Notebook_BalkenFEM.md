@@ -805,7 +805,7 @@ ax[1].set_xlabel("Anzahl Knoten")
 ax[1].set_ylabel("error Q")
 ax[1].set_yscale("log")  # Set y-axis to logarithmic scale
 ax[1].set_xscale("log")  # Set x-axis to logarithmic scale
-ax[0].grid(True)
+ax[1].grid(True)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": "slide"}}

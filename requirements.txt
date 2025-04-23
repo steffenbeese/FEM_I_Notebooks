@@ -5,3 +5,4 @@ plotly
 pandas
 sympy
 rise
+jupytext

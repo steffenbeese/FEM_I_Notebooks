@@ -294,13 +294,30 @@ class BalkenFEM:
             x1 = self.coords[node1,0]
             x2 = self.coords[node2,0]
 
-            if (x >= x1-1.e-12) and (x < x2):
+            if (x >= x1-1.e-12) and (x < x2+1.e-12):
                 director = self._getElementDirector(elID) 
                 le = np.linalg.norm(director)
                 dofe = np.array([self.dof[node1,0],self.dof[node1,1],self.dof[node2,0],self.dof[node2,1]])
                 xi = (x-x1)/(x2-x1)
                 N = np.array([2*xi**3 - 3*xi**2 + 1, (xi**3 - 2*xi**2 + xi), -2*xi**3 + 3*xi**2, (xi**3 - xi**2)])
                 return N @ dofe.T
+
+    def computeDisplacement(self,n=10):
+        X = np.zeros(n*self.numel+1)
+        uges = np.zeros(n*self.numel+1)
+        
+        for elID in range(self.numel):
+            node1 = self.elements[elID,0]
+            node2 =self.elements[elID,1]
+            x1 = self.coords[node1,0]
+            x2 = self.coords[node2,0]
+            for i in range(n):
+                t = float(i/n)
+                X[elID*n+i] = x1 + t*(x2-x1)
+                uges[elID*n+i] = self.getDisplacement(X[elID*n+i])
+        X[elID*n+n] = x2
+        uges[elID*n+n] = self.getDisplacement(x2)
+        return X,uges
 
     def assembleGlobalMatrix2D(self):
         """

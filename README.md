@@ -1,5 +1,7 @@
 # FEM_I_Notebooks
 
+Balken FEM Vorlesung [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/steffenbeese/FEM_I_Notebooks/HEAD?urlpath=%2Fdoc%2Ftree%2FVorlesung_BalkenFEM.ipynb)
+
 Balken FEM for Binder [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/steffenbeese/FEM_I_Notebooks/main?urlpath=%2Fdoc%2Ftree%2FNotebook_BalkenFEM.md)
 
 

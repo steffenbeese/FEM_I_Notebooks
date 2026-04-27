@@ -1,5 +1,7 @@
 # FEM_I_Notebooks
 
+Herleitung Verfahren von Ritz [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/steffenbeese/FEM_I_Notebooks/HEAD?urlpath=%2Fdoc%2Ftree%2FNotebook_StabRitz.ipynb)
+
 Balken FEM Vorlesung [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/steffenbeese/FEM_I_Notebooks/main?urlpath=%2Fdoc%2Ftree%2FVorlesung_BalkenFEM.ipynb)
 
 Balken FEM for Binder [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/steffenbeese/FEM_I_Notebooks/main?urlpath=%2Fdoc%2Ftree%2FNotebook_BalkenFEM.md)
@@ -8,7 +10,7 @@ Balken FEM for Binder [![Binder](https://mybinder.org/badge_logo.svg)](https://m
 Stab FEM for Binder [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/steffenbeese/FEM_I_Notebooks/main?urlpath=%2Fdoc%2Ftree%2FNotebook_StabFEM.ipynb)
 
 
-# Notes Praktikum 24.04.25
+# Notes Praktikum SoSe 2026
 
 - Python Notebook zur Stab FEM
 - Das Python Modul StabFEM.py liegt bei

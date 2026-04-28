@@ -1,5 +1,7 @@
 # FEM_I_Notebooks
 
+Herleitung der FEM für das Stabelement [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/steffenbeese/FEM_I_Notebooks/HEAD?urlpath=%2Fdoc%2Ftree%2FNotebook_StabFEM_Herleitung.ipynb)
+
 Herleitung Verfahren von Ritz [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/steffenbeese/FEM_I_Notebooks/HEAD?urlpath=%2Fdoc%2Ftree%2FNotebook_StabRitz.ipynb)
 
 Balken FEM Vorlesung [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/steffenbeese/FEM_I_Notebooks/main?urlpath=%2Fdoc%2Ftree%2FVorlesung_BalkenFEM.ipynb)

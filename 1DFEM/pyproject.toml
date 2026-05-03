@@ -1,0 +1,79 @@
+[build-system]
+# `setuptools` is used as build backend. `wheel` is required for building wheels.
+# (We do not rely on setuptools-scm at the moment because the version is set explicitly below.)
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fem1d"
+version = "1.0.0"
+description = "Finite-Element-Methode für 1D-Strukturen (Stäbe und Balken)"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+keywords = ["fem", "finite-element", "structural-analysis", "engineering"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Physics",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "numpy>=1.20.0",
+    "matplotlib>=3.4.0",
+    # TOML reader: stdlib `tomllib` exists in Python 3.11+, otherwise use `tomli`.
+    "tomli>=2.0.1; python_version < '3.11'",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.2.4",
+    "pytest-cov>=2.12.1",
+    "black>=21.5b0",
+    "flake8>=3.9.2",
+]
+
+# Dashboard / Web UI (optional)
+dashboard = [
+    "dash>=2.16",
+    "plotly>=5.18",
+    "jupyter-dash",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/fem1d"
+Repository = "https://github.com/yourusername/fem1d.git"
+"Bug Tracker" = "https://github.com/yourusername/fem1d/issues"
+
+[tool.setuptools]
+# Explicitly list the packages to avoid accidentally picking up top-level
+# helper/backup directories (e.g. `Bkp/`) in this flat repository layout.
+packages = ["fem1d"]
+package-dir = {"" = "."}
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=fem1d --cov-report=html --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["fem1d"]
+omit = [
+    "*/tests/*",
+    "*/__init__.py",
+]
+
+[tool.flake8]
+max-line-length = 100
+exclude = ["__pycache__", ".git", ".venv", "venv", "build", "dist"]

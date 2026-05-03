@@ -1,0 +1,39 @@
+[model]
+type = "stab"
+
+[mesh]
+coords = [
+  [0.0, 0.0],
+  [5.0, 0.0],
+  [10.0, 0.0],
+]
+
+elements = [
+  [0, 1],
+  [1,2],
+]
+
+[element_data]
+area = [100.0,100.0]
+youngs_modulus = [210000.0,210000.0]
+
+
+[bc]
+# rows: [node, dof, value]
+# dof can be 0/1 or "ux"/"uy"
+dirichlet = [
+  [0, "ux", 0.0],
+  [0, "uy", 0.0],
+  [1, "uy", 0.0],
+  [2, "uy", 0.0],
+]
+
+[loads]
+# rows: [node, dof, value]
+# dof can be 0/1 or "ux"/"uy"
+nodal = [
+  [1, "ux", 0.0],
+]
+distributed_nodal = [
+  10000,20000,10000
+]

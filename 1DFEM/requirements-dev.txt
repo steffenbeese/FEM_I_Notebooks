@@ -1,0 +1,15 @@
+# Development dependencies
+-r requirements.txt
+
+# Testing
+pytest>=6.2.4
+pytest-cov>=2.12.1
+
+# Code quality
+black>=21.5b0
+flake8>=3.9.2
+pylint>=2.9.0
+
+# Documentation (optional)
+# sphinx>=4.0.0
+# sphinx-rtd-theme>=0.5.0

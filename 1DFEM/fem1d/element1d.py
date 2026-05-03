@@ -1,7 +1,9 @@
 import numpy as np
 
 
-class FEM1D:
+from abc import ABC, abstractmethod
+class FEM1D(ABC):
+
     """
     Abstrakte Basisklasse für 1D-Finite-Elemente (Stab- und Balkenelemente).
 
@@ -50,6 +52,7 @@ class FEM1D:
         self.dL = np.zeros((self.numnp, 1))  # Verteilte Lasten
         self.dirichletBC = None
         self.Kuu = self.Kud = self.Kdu = self.Kdd = None
+        self.neumann_nodes = self.neumann_dir = self.neumann_val = None
 
     def setNodalCoordinates(self, coords):
         """
@@ -107,18 +110,30 @@ class FEM1D:
             neumannDir (list): Liste der Neumann-Randbedingungen: 0 = Kraft, 1 = Moment.
             neumannVal (list): Liste der Werte der Neumann-Randbedingungen.
         """
+        
+        self.neumann_nodes = neumannNodes
+        self.neumann_dir = neumannDir
+        self.neumann_val = neumannVal
+        
         for nodeID, nDir, nVal in zip(neumannNodes, neumannDir, neumannVal):
+            self.Fges[nodeID, nDir] = nVal
+            
+    def _setExternalForces(self):
+        if self.neumann_nodes is None:
+            return
+        for nodeID, nDir, nVal in zip(self.neumann_nodes, self.neumann_dir, self.neumann_val):
             self.Fges[nodeID, nDir] = nVal
 
     def resetFEM(self):
         """
         Setzt alle FEM-Matrizen und Freiheitsgrade zurück auf null.
         """
-        self.dof = np.zeros((self.numnp, self.dim))
-        self.eqind = np.zeros((self.numnp, self.dim), dtype=int)
+        # self.dof = np.zeros((self.numnp, self.dim))
+        # self.eqind = np.zeros((self.numnp, self.dim), dtype=int)
         self.Kges = np.zeros((self.numdof, self.numdof))
         self.Fges = np.zeros((self.numnp, self.dim))
-
+        self._setExternalForces()
+        
     def _getElementDirector(self, elID):
         """
         Berechnet den Richtungsvektor eines Elements.
@@ -178,6 +193,7 @@ class FEM1D:
         Baut die globale Steifigkeitsmatrix und den globalen Kraftvektor auf.
         Muss in Unterklassen implementiert werden.
         """
+        self.resetFEM()
         self._assembleGlobalMatrix2D()
 
     def solveSystem(self):
@@ -232,8 +248,7 @@ class FEM1D:
                             jfree += 1
                         else:
                             jIsFree = False
-                            jcon += 1
-
+                            jcon += 1 
                         eqJ = int(np.sign(self.eqind[nodeJ, dirJ]) * self.eqind[nodeJ, dirJ] - 1)
                         if iIsFree and jIsFree:
                             self.Kuu[ifree, jfree] = self.Kges[eqI, eqJ]
@@ -241,6 +256,7 @@ class FEM1D:
                             self.Kud[ifree, jcon] = self.Kges[eqI, eqJ]
                         if not iIsFree and not jIsFree:
                             self.Kdd[icon, jcon] = self.Kges[eqI, eqJ]
+        
 
         # Löse Gleichungssystem
         # K_uu*u = F - K_ud*u_d
@@ -316,15 +332,18 @@ class FEM1D:
             if (x >= x1 - 1.e-12) and (x < x2 + 1.e-12):
                 director = self._getElementDirector(elID) 
                 le = np.linalg.norm(director)
-                dofe = np.array([self.dof[node1, 0], self.dof[node2, 0],
-                               self.dof[node1, 1], self.dof[node2, 1]])
+                dofe = np.array([ [self.dof[node1, 0], self.dof[node1, 1]],
+                              [self.dof[node2, 0], self.dof[node2, 1]]
+                               ])
                 xi = (x - x1) / (x2 - x1)
                 
                 return callback(elID, xi, le, dofe)
-            
+
+    @abstractmethod
     def computeDisplacement(self, n=10):
         """
         Berechnet die Verschiebungen entlang der Struktur.
+        Muss in Unterklassen implementiert werden.
         
         Args:
             n (int): Anzahl der Stützpunkte je Element für die Berechnung.
@@ -332,15 +351,13 @@ class FEM1D:
         Returns:
             tuple: Koordinaten (np.ndarray) und Verschiebungen (np.ndarray) entlang der Struktur.
         """
-        def callback(elID, xi, le, dofe):
-            N = self.shapeFunction(xi)
-            return (N @ dofe.T) [1]
-        
-        return self._computeAlongStructure(callback, n)
-            
+        raise NotImplementedError
+
+    @abstractmethod
     def getDisplacement(self, x):
         """
         Berechnet die Verschiebung an einer bestimmten Position x entlang der Struktur.
+        Muss in Unterklassen implementiert werden.
 
         Args:
             x (float): Position entlang der Struktur.
@@ -348,20 +365,14 @@ class FEM1D:
         Returns:
             float: Verschiebung an der Position x.
         """
-        def callback(elID, xi, le, dofe):
-            N = self.shapeFunction(xi)
-            return N @ dofe.T
-        
-        return self._computeAtMaterialPoint(x, callback)
+        raise NotImplementedError
 
+    @abstractmethod
     def shapeFunction(self, xi):
         """
         Berechnet die Formfunktionen. Muss in Unterklassen implementiert werden.
 
         Args:
             xi (float): Normalisierte Koordinate.
-
-        Raises:
-            NotImplementedError: Muss in Unterklassen implementiert werden.
         """
-        raise NotImplementedError("Muss in Unterklassen implementiert werden.")
+        raise NotImplementedError

@@ -371,7 +371,7 @@ def read_problem_toml_bytes(data: bytes, *, encoding: str = "utf-8") -> Fem1dPro
     return read_problem_toml_str(data.decode(encoding))
 
 
-def build_model(problem: Fem1dProblem) -> Union[StabFEM, BalkenFEM]:
+def build_model(problem: Fem1dProblem)-> Union[StabFEM, BalkenFEM]:
     """Build a :class:`~fem1d.stabfem.StabFEM` or :class:`~fem1d.balkenfem.BalkenFEM` from a Fem1dProblem."""
 
     numnp = int(problem.coords.shape[0])

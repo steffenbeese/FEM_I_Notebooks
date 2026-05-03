@@ -210,7 +210,7 @@ class StabFEM:
             director = self._getElementDirector(elID) 
             le = np.linalg.norm(director)
             R = self._getTransFormationMatrix(elID)
-            Feval = self.eData[elID]["area"] * le * self.eData[elID]["lineLoad"] * 0.5
+            Feval = le * self.eData[elID]["lineLoad"] * 0.5
             Fe = np.zeros((4, 1))
             Fe[0, 0] = 1
             Fe[2, 0] = 1

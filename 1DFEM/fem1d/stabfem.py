@@ -146,11 +146,31 @@ class StabFEM(FEM1D):
         def callback(elID, xi, le, dofe):
             R = self._getTransFormationMatrix(elID)
             EA = self.eData[elID]["area"] * self.eData[elID]["youngsmodulus"]
-            dofl = R @ dofe
+            dofl = (R @ dofe.reshape(-1, 1))
             B = 1.0 / le * np.array([-1, 0, 1, 0])
             return EA * B @ dofl
        
         return self._computeAlongStructure(callback, n)
+    
+    def computeDisplacement(self,n=10):
+        
+        def callback(elID,xi,le,dofe):
+            N = self.shapeFunction(xi)
+            u1 = N[0] * dofe[0,0] + N[1] * dofe[1,0]
+            u2 = N[0] * dofe[0,1] + N[1] * dofe[1,1]
+            return np.sign(u1)*np.sqrt(u1**2+u2**2)
+        
+        return self._computeAlongStructure(callback, n)
+    
+    def getDisplacement(self,X):
+        
+        def callback(elID,xi,le,dofe):
+            N = self.shapeFunction(xi)
+            u1 = N[0] * dofe[0,0] + N[1] * dofe[1,0]
+            u2 = N[0] * dofe[0,1] + N[1] * dofe[1,1]
+            return np.sign(u1)*np.sqrt(u1**2+u2**2)
+        
+        return self._computeAtMaterialPoint(X,callback)
 
     def plotMesh(self, deformed=False, scale=1.0, ax=None, fig=None):
         """

@@ -1,0 +1,33 @@
+[model]
+type = "stab"
+
+[mesh]
+coords = [
+  [0,0],                   ### Ausfüllen
+  [150,0],
+  [300,0],
+  [450,0],
+]
+
+elements = [
+  [0,1],                   ### Ausfüllen
+  [1,2],
+  [2,3]
+]
+
+[element_data]
+area = [30,60,30]               ### Ausfüllen
+youngs_modulus = [210000,105000,210000]     ### Ausfüllen
+
+[bc]
+# rows: [node, dof, value]
+# dof can be 0/1 or "ux"/"uy"
+dirichlet = [
+  [0, "uy", 0.0],
+  [1, "ux", 3.0],
+  [1, "uy", 0.0],
+  [2, "uy", 0.0],
+  [2, "ux",-3.0],
+  [3, "uy", 0.0],
+  
+]

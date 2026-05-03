@@ -1,3 +1,26 @@
+name: fem
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - jupyter-book
+  - jupyterlab
+  - jupyterlab_rise
+  - jupytext
+  - matplotlib
+  - numpy
+  - pandas
+  - sympy
+  - rise
+  - ipywidgets
+  - plotly
+  - dash
+  - jupyter-dash
+  - pip:
+      - jupyterlab-rise-metadata-form
+      - markdown
+      - ./1DFEM
 name: binderNotebooks
 channels:
   - conda-forge

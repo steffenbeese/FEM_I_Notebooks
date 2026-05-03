@@ -178,4 +178,5 @@ dependencies:
   - zipp=3.21.0=pyhd8ed1ab_1
   - zstd=1.5.7=hb8e6e7a_2
   - rise
+  - jupyter-dash
 prefix: /home/steffen/anaconda3/envs/binderNotebooks

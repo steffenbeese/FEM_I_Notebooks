@@ -116,7 +116,7 @@ class StabFEM(FEM1D):
         director = self._getElementDirector(elID)
         le = np.linalg.norm(director)
         director = director / le
-        normal = np.array([[-director[1]], [director[0]]])
+        normal = np.array([-director[1], director[0]])
         E1 = np.zeros((2, 2))
         E1[0, 0] = 1.0
         E1[1, 1] = 1.0

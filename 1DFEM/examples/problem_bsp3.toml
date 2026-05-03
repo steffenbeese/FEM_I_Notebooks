@@ -31,3 +31,5 @@ dirichlet = [
   [3, "uy", 0.0],
   
 ]
+
+[load]

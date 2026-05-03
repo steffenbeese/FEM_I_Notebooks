@@ -174,6 +174,43 @@ class BalkenFEM(FEM1D):
         
         return self._computeAlongStructure(callback, n)
 
+    def computeDisplacement(self, n=10):
+        """
+        Berechnet die Verschiebungen (Durchbiegungen) entlang der Balkenstruktur.
+
+        Args:
+            n (int): Anzahl der Stützpunkte je Element für die Berechnung.
+
+        Returns:
+            tuple: Koordinaten (np.ndarray) und Verschiebungen (np.ndarray) entlang der Balkenstruktur.
+        """
+        def callback(elID, xi, le, dofe):
+            N = self.shapeFunction(xi)
+            w = (N[0] * dofe[0, 0] + N[1] * le * dofe[0, 1]
+               + N[2] * dofe[1, 0] + N[3] * le * dofe[1, 1])
+            return w
+
+        return self._computeAlongStructure(callback, n)
+
+    def getDisplacement(self, X):
+        """
+        Berechnet die Verschiebung (Durchbiegung) an einer bestimmten Position X
+        entlang der Balkenstruktur.
+
+        Args:
+            X (float): Position entlang der Struktur.
+
+        Returns:
+            float: Verschiebung an der Position X.
+        """
+        def callback(elID, xi, le, dofe):
+            N = self.shapeFunction(xi)
+            w = (N[0] * dofe[0, 0] + N[1] * le * dofe[0, 1]
+               + N[2] * dofe[1, 0] + N[3] * le * dofe[1, 1])
+            return w
+
+        return self._computeAtMaterialPoint(X, callback)
+
     def _assembleGlobalMatrix2D(self):
         """
         Baut die globale Steifigkeitsmatrix und den globalen Kraftvektor auf (interne Methode).

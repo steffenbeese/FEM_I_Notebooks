@@ -1,0 +1,31 @@
+[model]
+type = "balken"
+
+[mesh]
+coords = [
+  [   0.,    0.],
+  [4000.,    0.],
+  [8000.,    0.]
+  ]
+
+elements = [
+  [0, 1],
+  [1, 2],
+]
+
+[element_data]
+sma = [77.67*10**4,77.67*10**4]
+youngs_modulus = [210000.0,210000.0]
+
+[bc]
+# rows: [node, dof, value]
+# dof can be 0/1 or "ux"/"uy"
+dirichlet = [
+  [0, "ux", 0.0],
+  [1, "ux", 0.0],
+]
+
+[loads]
+distributed_nodal = [
+  -10,-10,-10
+]

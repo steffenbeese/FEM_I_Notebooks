@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from .element1d import FEM1D
 
 
@@ -153,7 +154,7 @@ class BalkenFEM(FEM1D):
         def callback(elID, xi, le, dofe):
             EI = self.eData[elID]["youngsmodulus"] * self.eData[elID]["sma"]
             B = 1.0 / (le**2) * self.secondDerivative(xi)
-            return -EI * (B @ dofe.T)
+            return -EI * (B @ dofe.reshape(-1).T)
         
         return self._computeAlongStructure(callback, n)
     
@@ -170,7 +171,7 @@ class BalkenFEM(FEM1D):
         def callback(elID, xi, le, dofe):
             EI = self.eData[elID]["youngsmodulus"] * self.eData[elID]["sma"]
             B = 1.0 / (le**3) * self.thirdDerivative(xi)
-            return -EI * (B @ dofe.T)
+            return -EI * (B @ dofe.reshape(-1))
         
         return self._computeAlongStructure(callback, n)
 
@@ -186,11 +187,106 @@ class BalkenFEM(FEM1D):
         """
         def callback(elID, xi, le, dofe):
             N = self.shapeFunction(xi)
-            w = (N[0] * dofe[0, 0] + N[1] * le * dofe[0, 1]
-               + N[2] * dofe[1, 0] + N[3] * le * dofe[1, 1])
+            w = (N[0] * dofe[0, 0] + N[1] *  dofe[0, 1]
+               + N[2] * dofe[1, 0] + N[3] *  dofe[1, 1])
             return w
 
         return self._computeAlongStructure(callback, n)
+
+    def plotBalken(self, q=None, fval1=None, u=None, n=5, w_analytisch=None, ax=None, fig=None):
+        """
+        Visualisiert den Balken, optionale Verformung und Lastpfeile.
+
+        Args:
+            q (array-like, optional): Knotenweise verteilte Lasten fuer Pfeildarstellung.
+                Falls None, werden self.dL verwendet.
+            fval1 (array-like, optional): Knotenweise Einzel-/aequivalente Lasten fuer
+                Pfeildarstellung. Falls None, wird self.Fges[:, 0] verwendet.
+            u (any, optional): Wenn nicht None, wird die berechnete FEM-Durchbiegung
+                entlang der Struktur geplottet.
+            n (int, optional): Anzahl Stuetzpunkte je Element fuer die Verformungskurve.
+            w_analytisch (callable, optional): Funktion w(x) fuer analytische Vergleichskurve.
+            ax (matplotlib.axes.Axes, optional): Zielachse.
+            fig (matplotlib.figure.Figure, optional): Zielabbildung.
+
+        Returns:
+            tuple: (fig, ax)
+        """
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(10, 5))
+
+        X = self.coords
+        x_coords = X[:, 0]
+        y_coords = X[:, 1]
+
+        y_candidates = [y_coords]
+
+        if u is not None:
+            Xn, un = self.computeDisplacement(n=n)
+            ax.plot(Xn, un, c="b", linewidth=2.0)
+            y_candidates.append(un)
+
+            if w_analytisch is not None:
+                xline = np.linspace(np.min(x_coords), np.max(x_coords), 100)
+                w_ana = np.asarray(w_analytisch(xline), dtype=float)
+                ax.plot(xline, w_ana, "r--", linewidth=2.0)
+                y_candidates.append(w_ana)
+                ax.legend(["w - FEM", "w - analytisch"])
+
+        # Elemente als dicke Linien
+        for elID in range(self.numel):
+            n1, n2 = self.elements[elID]
+            ax.plot(
+                [x_coords[n1], x_coords[n2]],
+                [y_coords[n1], y_coords[n2]],
+                c="k",
+                linewidth=5.0,
+                solid_capstyle="round",
+                zorder=2,
+            )
+
+        # Knoten als Punkte
+        ax.scatter(x_coords, y_coords, c="k", s=90, zorder=3)
+
+        if q is None:
+            q_plot = np.asarray(self.dL).reshape(-1)
+        else:
+            q_plot = np.asarray(q).reshape(-1)
+
+        if fval1 is None:
+            f_plot = np.asarray(self.Fges[:, 0]).reshape(-1)
+        else:
+            f_plot = np.asarray(fval1).reshape(-1)
+
+        zeros = np.zeros(self.numnp)
+        ax.quiver(x_coords, y_coords, zeros, q_plot, color="red")
+        ax.quiver(x_coords, y_coords, zeros, f_plot, color="red")
+
+        # Achsgrenzen mit Rand fuer bessere Lesbarkeit
+        x_min = float(np.min(x_coords))
+        x_max = float(np.max(x_coords))
+        x_span = max(x_max - x_min, 1.0)
+
+        y_all = np.concatenate([np.asarray(vals, dtype=float).reshape(-1) for vals in y_candidates])
+        y_min = float(np.min(y_all))
+        y_max = float(np.max(y_all))
+        y_span = y_max - y_min
+
+        x_pad = 0.05 * x_span
+        y_pad = max(0.15 * max(y_span, 1e-12), 0.03 * x_span)
+
+        ax.set_xlim(x_min - x_pad, x_max + x_pad)
+        ax.set_ylim(y_min - y_pad, y_max + y_pad)
+
+        ax.set_xlabel("x [mm]")
+        ax.set_ylabel("w [mm]")
+        ax.set_title("Balken")
+        ax.grid(True)
+
+        ax.set_aspect("auto")
+        plt.show()
+
+        return fig, ax
 
     def getDisplacement(self, X):
         """

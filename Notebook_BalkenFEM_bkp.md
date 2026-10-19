@@ -5,9 +5,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.16.7
+    jupytext_version: 1.19.5
 kernelspec:
-  display_name: Python 3 (ipykernel)
+  display_name: FEM
   language: python
   name: python3
 ---
@@ -544,6 +544,10 @@ slideshow:
 ---
 Lastfall.assembleGlobalMatrix2D()
 Lastfall.solveSystem()
+```
+
+```{code-cell} ipython3
+Lastfall.dof
 ```
 
 ```{code-cell} ipython3

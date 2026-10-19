@@ -5,9 +5,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.16.7
+    jupytext_version: 1.19.5
 kernelspec:
-  display_name: Python 3 (ipykernel)
+  display_name: FEM
   language: python
   name: python3
 ---
@@ -139,7 +139,7 @@ Die Steifigkeitsmatrix $\boldsymbol{K}_{IJ}$ wollen wir jetzt interaktiv berechn
 
 +++ {"editable": true, "slideshow": {"slide_type": "slide"}}
 
-### Definition der Formfunktionen
+### 1. Definition der Formfunktionen
 
 ```{code-cell} ipython3
 ---
@@ -148,6 +148,7 @@ slideshow:
   slide_type: ''
 ---
 import sympy as sp
+from IPython.display import display, Math, Latex
 
 # Define the variables
 xi,ell = sp.symbols('xi, ell')
@@ -164,7 +165,7 @@ N
 
 +++ {"editable": true, "slideshow": {"slide_type": "slide"}}
 
-### Berechnung der Ableitungen
+### 2. Berechnung der Ableitungen
 
 Siehe schwache Form:
 $$
@@ -197,7 +198,7 @@ dNdxidxidxi
 
 +++ {"editable": true, "slideshow": {"slide_type": "slide"}}
 
-### Bildung des Integranten
+### 3. Bildung des Integranten
 
 Siehe schwache Form:
 $$
@@ -220,7 +221,7 @@ integrant
 
 +++ {"editable": true, "slideshow": {"slide_type": "slide"}}
 
-### Integration
+### 4. Integration
 
 Siehe schwache Form:
 $$
@@ -240,6 +241,43 @@ slideshow:
 EI = sp.symbols('EI')
 Kmat = EI/ell**3 * sp.integrate(integrant,(xi,0,1))
 Kmat
+```
+
+### Alternatives Vorgehen
+
+Alternativ kann wie beim Stabelement die innere virtuelle Energie direkt berechnet werden:
+
+```{code-cell} ipython3
+# Unbekannte Koeffizienten w_i
+wlist = [sp.Symbol(f'w_{i}') for i in range(4)]
+w_i = sp.Matrix(wlist)
+
+# Verschiebungsansatz w_h(x)
+w_h = N.T @ w_i
+
+# Unbekannte Koeffizienten delta w_i
+dwlist = [sp.Symbol(f'dw_{i}') for i in range(4)]
+dw_i = sp.Matrix(dwlist)
+
+# Verschiebungsansatz delta w_h
+dw_h = N.T @ dw_i
+
+dxidx = 1/ell
+
+d2wdxdx = sp.diff(w_h,xi,2)*dxidx**2
+d2dwdxdx = sp.diff(dw_h,xi,2)*dxidx**2
+
+# innere virtuelle Energie
+W_int = (EI * sp.integrate(d2wdxdx*d2dwdxdx,(xi,0,1))*1/dxidx)[0]
+display(Math(r'W_{int} = '+sp.latex(W_int)))
+
+# Build stiffness matrix by differentiating w.r.t. scalar coefficients
+auto_K = sp.zeros(4, 4)
+for i in range(4):
+    for j in range(4):
+        auto_K[i, j] = sp.simplify(sp.diff(W_int, dwlist[i], wlist[j]))
+
+display(Math(r'\mathbf{K}= ' + sp.latex(auto_K)))
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": "slide"}}
@@ -380,12 +418,12 @@ eq2 = Eq(w.subs(x,ell),0)
 eq3 = Eq(-w.diff(x,2).subs(x,0),0)
 eq4 = Eq(-w.diff(x,2).subs(x,ell),0)
 solution = sp.solve((eq1,eq2,eq3,eq4),(C_1,C_2,C_3,C_4))
-wfun = w.subs(solution)
+wfun = -w.subs(solution)
 Mfun = -wfun.diff(x,2)
 Qfun = -wfun.diff(x,3)
 
 # Plot der Biegelinie und Schnittgrößen
-wp = w.subs(solution).subs({"ell":1,"q0":1,"EI":1})
+wp = -w.subs(solution).subs({"ell":1,"q0":1,"EI":1})
 M = -wp.diff(x,2)
 Q = -wp.diff(x,3)
 
@@ -401,135 +439,55 @@ PlotGrid(1,3,p1,p2,p3,size=(15,5));
 
 ## Lösung mit der FEM
 
-```{code-cell} ipython3
-from IPython.display import display, Markdown
-
-# Open the Python file and read its content
-with open('BalkenFEM.py', 'r') as file:
-    content = file.read()
-
-# Display the content as Markdown
-display(Markdown(f'```python\n{content}\n```'))
-```
-
 +++ {"editable": true, "slideshow": {"slide_type": "slide"}}
 
 ## Set Up Problem
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
-from BalkenFEM import BalkenFEM
-import numpy as np
-import sympy as sp
-
-numnp = 3 # Anzahl der Knoten im System
-numel = numnp -1 # Anzahl der Elemente im System
-ell = 8000 # Länge des Balkens in mm
-
-# Erzeugen des FE-Objektes
-Lastfall = BalkenFEM(numnp=numnp,numel=numel)
-
-# Definiere die Koordinaten der beiden Randknoten
-X1 = np.array([0.0,0.0]) #mm
-X2 = np.array([ell,0.0]) #mm
-
-
-# Generate interpolation points
-t = np.linspace(0, 1, numnp)
-X = X1 + t[:, np.newaxis] * (X2 - X1)
-# print(f"Coordinates of the nodes: \n{X}") 
-
-Lastfall.setNodalCoords(X)
-
-# Generate Elements
-IX = np.column_stack((np.arange(0, numnp-1), np.arange(1, numnp)))
-# print(f"Connectivity table: \n{IX}")
-
-Lastfall.setElements(IX)
-
-# Material properties and cross section
-Emod = 210000 # MPa
-sma = 77.67*10**4 # mm^4
-Ilist = [sma for i in range(numel)]
-Elist = [Emod for i in range(numel)]
-
-Lastfall.setElementData(Elist, Ilist)
+import fem1d
+from fem1d import BalkenFEM
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": "slide"}}
-
-## Definiere Randbedingungen
-
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
-# Dirichlet Randbedingungen (Verschiebung)
-dnodes = [0, numnp-1]
-ddir = [0,0]
-dval = [0,0]
+inputstring="""
+[model]
+type = "balken"
 
+[mesh]
+coords = [
+  [0.0, 0.0],
+  [4000.0, 0.0],
+  [8000.0, 0.0]
+]
 
-Lastfall.setDirichletBoundaryCondition(dnodes,ddir,dval)
+elements = [
+  [0, 1],
+  [1, 2]
+]
 
-# Neumann Randbedingungen (Kraft)
-fnodes = [i for i in range(numnp)] # forces
-mnodes = [i for i in range(numnp)] # moments
-fdir1 = [0 for i in range(numnp)] 
-mdir2 = [1 for i in range(numnp)] 
-fval1 = [0 for i in range(numnp)]
-mval2 = [0 for i in range(numnp)]
-q0 = -10 # N/mm
-# fval1[2] = q0*ell
+[element_data]
+sma = [776700.0, 776700.0]
+youngs_modulus = [210000.0, 210000.0]
 
-Lastfall.setExternalForces(fnodes+mnodes,fdir1+mdir2,fval1+mval2)
+[bc]
+# rows: [node, dof, value]
+# dof for balken: "uy"/"w" and "phi"/"rot"
+dirichlet = [
+  [0, "w", 0.0],
+  [2, "w", 0.0]
+]
 
-# Verteilte Lasten
-
-q=q0*np.ones((numnp,1))
-Lastfall.setDistributedLoads(q)
+[loads]
+distributed_nodal = [-10.0, -10.0, -10.0]
+"""
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": "slide"}}
-
-## Plot Problem
+```{code-cell} ipython3
+bsp1 = fem1d.read_model_toml_str(inputstring)
+```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
-import matplotlib.pyplot as plt
-wanalytisch = sp.lambdify(x,wfun.subs({"EI":Emod*sma,"q0":q0,"ell":ell}),"numpy")
-
-
-def plotBalken(X,q,fval1,u=None):
-    fix,ax = plt.subplots(figsize=(10,5))
-    if u is not None:
-        ax.plot(X[:,0],X[:,1]+u,c='b')
-        xline = np.linspace(0,ell,100)
-        ax.plot(xline,wanalytisch(xline),'b--')
-        ax.legend(["w - FEM","w - analytisch"])
-    ax.scatter(X[:,0],X[:,1],c='k',s=100)
-    ax.plot(X[:,0],X[:,1],c='k')
-    ax.quiver(X[:,0], X[:,1],  [0 for i in range(numnp)],q,color='red')
-    ax.quiver(X[:,0], X[:,1],  [0 for i in range(numnp)],fval1,color='red')
-    ax.set_xlabel('x [mm]')
-    ax.set_ylabel('w [mm]')
-    ax.set_title('Balken')
-    ax.grid(True)
-    
-    plt.axis('equal')
-    plt.show()
-
-plotBalken(X,q,fval1)
+bsp1.plotBalken()
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": "slide"}}
@@ -542,32 +500,38 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-Lastfall.assembleGlobalMatrix2D()
-Lastfall.solveSystem()
+bsp1.assembleGlobalMatrix()
+bsp1.solveSystem()
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
-plotBalken(X,q,fval1,Lastfall.dof[:,0])
+bsp1.dof
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
+Emod = 210000 # MPa
+sma = 77.67*10**4 # mm^4
+q0 = 10 # N/mm
+ell = 8000 # mm
+
+
+wanalytisch = sp.lambdify(x,wfun.subs({"EI":Emod*sma,"q0":q0,"ell":ell}),"numpy")
 wa = wanalytisch(4000)
-wFEM = Lastfall.getDeflection(4000)
+wFEM = bsp1.getDisplacement(4000)
 error = (wa-wFEM)/wa*100
 
 print(f"Durchbiegung analytisch: {wa}")
 print(f"Durchbiegung FEM: {wFEM}")
 print(f"Fehler: {error}%")
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+---
+bsp1.plotBalken(u=True,n=10,w_analytisch=wanalytisch)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": "subslide"}}
@@ -584,13 +548,14 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-xm,M = Lastfall.computeMoment(n=10)
+xm,M = bsp1.computeMoment(n=10)
 Manalytisch  = sp.lambdify(x,Mfun.subs({"EI":Emod*sma,"q0":q0,"ell":ell}),"numpy")
 
+import matplotlib.pyplot as plt
 
 def plotMoment(x,M):
     fix,ax = plt.subplots(figsize=(10,5))
-    ax.plot(x,M,'r')
+    ax.plot(x,M/(Emod*sma),'r')
     ax.plot(x,Manalytisch(x),'r--')
     ax.legend(["M - FEM","M - analytisch"])
     ax.grid(True)
@@ -606,7 +571,7 @@ slideshow:
   slide_type: ''
 ---
 Ma = Manalytisch(4000)
-MFEM = np.min(M)
+MFEM = np.min(M)/(Emod*sma)
 error = (Ma-MFEM)/Ma*100
 
 print(f"Biegemoment analytisch: {Ma}")
@@ -624,13 +589,13 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-xm,Q = Lastfall.computeQuerkraft(n=10)
+xm,Q = bsp1.computeQuerkraft(n=10)
 Qanalytisch  = sp.lambdify(x,Qfun.subs({"EI":Emod*sma,"q0":q0,"ell":ell}),"numpy")
 
 
 def plotQuerkraft(x,Q):
     fix,ax = plt.subplots(figsize=(10,5))
-    ax.plot(x,Q,'b')
+    ax.plot(x,Q/(Emod*sma),'b')
     ax.plot(x,Qanalytisch(x),'b--')
     ax.legend(["Q - FEM","Q - analytisch"])
     ax.grid(True)
@@ -645,7 +610,7 @@ slideshow:
   slide_type: ''
 ---
 Qa = Qanalytisch(0)
-QFEM = np.min(Q)
+QFEM = np.min(Q)/(Emod*sma)
 error = (Qa-QFEM)/Qa*100
 
 print(f"Querkraft analytisch: {Qa}")
@@ -721,7 +686,7 @@ def setUpProblem(numnp):
     Lastfall.setDistributedLoads(q)
 
 
-    Lastfall.assembleGlobalMatrix2D()
+    Lastfall.assembleGlobalMatrix()
     Lastfall.solveSystem()
 
     xm,Q = Lastfall.computeQuerkraft(n=3)
@@ -747,8 +712,8 @@ ErrorQ= np.zeros((51,))
 for i,p in enumerate(npoints):
     
     QQ,MM,LC=setUpProblem(int(p))
-    QFEM[i]=QQ
-    MFEM[i]=MM
+    QFEM[i]=QQ/(Emod*sma)
+    MFEM[i]=MM/(Emod*sma)
     ErrorQ[i] = (Qa-QFEM[i])/Qa*100
     ErrorM[i] = (Ma-MFEM[i])/Ma*100
 ```
@@ -761,8 +726,8 @@ slideshow:
 ---
 import pandas as pd
 
-df = pd.DataFrame({"M":MFEM,"error M":ErrorM,"Q":QFEM,"error Q":ErrorQ},index=npoints)
-
+df = pd.DataFrame({"M":MFEM,"error M":ErrorM,"Q":QFEM,"error Q":ErrorQ},index=npoints,)
+df.index.name = "Anzahl Knoten"
 df
 ```
 
@@ -806,6 +771,19 @@ ax[1].set_ylabel("error Q")
 ax[1].set_yscale("log")  # Set y-axis to logarithmic scale
 ax[1].set_xscale("log")  # Set x-axis to logarithmic scale
 ax[1].grid(True)
+```
+
+```{code-cell} ipython3
+fig, ax = plt.subplots(1,1,figsize=(9,6))
+ax.plot(df.index,df["error M"],label="error M")
+ax.plot(df.index,df["error Q"],label="error Q")
+ax.set_title("Konvergenz der Fehler ")
+ax.set_xlabel("Anzahl Knoten")
+ax.set_ylabel("error")
+ax.set_yscale("log")  # Set y-axis to logarithmic scale
+ax.set_xscale("log")  # Set x-axis to logarithmic scale
+ax.grid(True)
+ax.legend()
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": "slide"}}

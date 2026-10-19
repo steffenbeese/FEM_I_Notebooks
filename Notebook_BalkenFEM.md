@@ -805,3 +805,21 @@ plt.ylabel('Row Index')
 plt.grid()
 plt.show()
 ```
+
+## Zusammenfassung
+
+<div style="border: 2px solid #4bb98c; padding: 15px; border-radius: 8px; background-color: #f0faf6; margin-bottom: 15px;">
+    <h3 style="margin-top:0; color:#2d7a5c;">Key Takeaways</h3>
+    <ol>
+        <li>Das 2-Knoten-Balkenelement besitzt die Freiheitsgrade <strong>Durchbiegung</strong> und <strong>Rotation</strong> je Knoten.</li>
+        <li>Mit den Hermite-Formfunktionen werden <strong>w</strong>, <strong>M</strong> und <strong>Q</strong> konsistent aus demselben Ansatzfeld bestimmt.</li>
+        <li>Die Elementsteifigkeitsmatrix skaliert mit <strong>EI / l<sup>3</sup></strong>; die äquivalenten Knotenlasten aus <strong>q(x)</strong> gehen in den Lastvektor ein.</li>
+        <li>Durch Assemblierung und Randbedingungen entsteht das globale Gleichungssystem <strong>K u = f</strong>, aus dem Verformungen und Reaktionsgrößen folgen.</li>
+        <li>Der Vergleich FEM vs. analytisch zeigt: Mit Verfeinerung des Netzes sinkt der Fehler für <strong>Durchbiegung</strong>, <strong>Moment</strong> und <strong>Querkraft</strong>.
+        <li> Der Fehler in der Verschiebung ist kleiner als der Fehler im Moment und der Fehler im Moment ist kleiner als der Fehler in der Querkraft
+        <li> Die Gesamtsteifikeitsmatrix hat eine Bandstruktur
+        </li>
+    </ol>
+</div>
+
++++

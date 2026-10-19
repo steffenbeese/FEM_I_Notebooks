@@ -146,7 +146,7 @@ class StabFEM(FEM1D):
         def callback(elID, xi, le, dofe):
             R = self._getTransFormationMatrix(elID)
             EA = self.eData[elID]["area"] * self.eData[elID]["youngsmodulus"]
-            dofl = (R @ dofe.reshape(-1, 1))
+            dofl = (R @ dofe.reshape(-1))
             B = 1.0 / le * np.array([-1, 0, 1, 0])
             return EA * B @ dofl
        
